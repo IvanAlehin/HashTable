@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <stdexcept> 
+#define W sizeof(size_t) * 8
+#define L 11
+#define A 12345 
 
 using namespace std;	
 
@@ -22,8 +25,8 @@ private:
 
 	size_t hash(const K& key) const {
 		//The multiply-shift method
-		return 0;
-
+		size_t tmp = key * A;
+		return ((tmp >> L) | (tmp << W - L));
 	}
 	void copy(const Map<K, T>& other) {
 		for (size_t i(0); i < _size; ++i) {
