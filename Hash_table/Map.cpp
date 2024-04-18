@@ -4,7 +4,7 @@
 #include <stdexcept> 
 #define W sizeof(size_t) * 8
 #define L 11
-#define A 12345 
+#define A 0.7
 
 using namespace std;	
 
@@ -26,7 +26,7 @@ private:
 	size_t hash(const K& key) const {
 		//The multiply-shift method
 		size_t tmp = key * A;
-		return ((tmp >> L) | (tmp << W - L));
+		return ((tmp >> L) | (tmp << W - L)) % _size;
 	}
 	void copy(const Map<K, T>& other) {
 		for (size_t i(0); i < _size; ++i) {
@@ -226,4 +226,22 @@ public:
 		}
 	}
 };
+
+char pearson_hash(Map<char, char> map, const std::string& str) {
+	char hash = 0;
+	for (char c : str) {
+		hash = *map.search((hash ^ (unsigned)c));
+	}
+	return hash;
+}
+
+bool is_equal(const std::string& left, const std::string& right) {
+	auto map = Map<char, char>(16, time(NULL));
+	if (pearson_hash(map, left) == pearson_hash(map, right)) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 
