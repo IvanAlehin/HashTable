@@ -6,6 +6,7 @@ using namespace std;
 
 int main() {
 	Map<int, int> map;
+	Map<int, int> Map(260,23);
 	map.insert(1, 123124);
 	map.insert(21, 2);
 	map.insert(3, 3);
@@ -23,8 +24,20 @@ int main() {
 
 	map.print();
 	cout << endl << endl;
+	
 
-    cout << is_equal("world", "world");
-    return 0;
+
+
+
+    cout << is_equal("qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm", 
+					 "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm");
+    
+	Map.insert(551, 123124);
+	Map.insert(261, 2);
+	Map.insert(366, 3);
+	Map.insert(645, 4); 
+	Map.print();
+	
+	return 0;
 
 }

@@ -23,12 +23,17 @@ private:
 	size_t _size;
 	Pair<K, T>** _buskets;
 
-	size_t hash(const K& key) const {
+	 size_t hash(const K& key) const {
 		//The multiply-shift method
 		size_t tmp = key * A;
 		return ((tmp >> L) | (tmp << W - L)) % _size;
 	}
 	void copy(const Map<K, T>& other) {
+		_size = other._size;
+		_buskets = new Pair<K, T>*[_size];
+		for (size_t i(0); i < _size; ++i) {
+			_buskets[i] = nullptr;
+		}
 		for (size_t i(0); i < _size; ++i) {
 			Pair<K, T>* tmp = other._buskets[i];
 			while (tmp) {
@@ -39,21 +44,22 @@ private:
 	}
 
 public:
-	Map<K, T>() {
+	/*Map<K, T>() {
 		_size = 10;
 		_buskets = new Pair<K, T>* [_size];
 		for (size_t i(0); i < _size; ++i) {
 			_buskets[i] = nullptr;
 		}
-	};
-	Map<K, T>(const size_t& size) {
+	};*/
+	Map<K, T>(size_t size=10) {
+		if(!size) throw std::invalid_argument("Size is zero");
 		_size = size;
 		_buskets = new Pair<K, T>* [_size];
 		for (size_t i(0); i < size; ++i) {
 			_buskets[i] = nullptr;
 		}
 	}
-	Map<K, T>(const size_t& size, const unsigned& seed) {
+	Map<K, T>(size_t size, unsigned seed) {
 		_size = size;
 		_buskets = new Pair<K, T>* [_size];
 		for (size_t i(0); i < size; ++i) {
@@ -71,11 +77,6 @@ public:
 		}
 	}
 	Map<K, T>(const Map<K, T>& other) {
-		_size = other._size;
-		_buskets = new Pair<K, T>* [_size];
-		for (size_t i(0); i < _size; ++i) {
-			_buskets[i] = nullptr;
-		}
 		copy(other);
 	}
 	~Map<K, T>() {
@@ -89,11 +90,7 @@ public:
 		}
 		clear();
 		delete[] _buskets;
-		_size = other._size;
-		_buskets = new Pair<K, T>* [_size];
-		for (size_t i(0); i < _size; ++i) {
-			_buskets[i] = nullptr;
-		}
+		
 		copy(other);
 		return *this;
 	}
@@ -120,6 +117,7 @@ public:
 		while (tmp) {
 			if (tmp->key == key) {
 				throw std::invalid_argument("This key already in map");
+				return;
 			}
 			if (tmp->next) {
 				tmp = tmp->next;
@@ -130,24 +128,24 @@ public:
 			}
 		}
 	}
-	void insert_or_assign(const K& key, const T& value) const {
+	bool insert_or_assign(const K& key, const T& value) const {
 		size_t index = hash(key);
 		auto tmp = _buskets[index];
 		if (!tmp) {
 			_buskets[index] = new Pair<K, T>(key, value);
-			return;
+			return true;
 		}
 		while (tmp) {
 			if (tmp->key == key) {
 				tmp->value = value;
-				return;
+				return false;
 			}
 			if (tmp->next) {
 				tmp = tmp->next;
 			}
 			else {
 				tmp->next = new Pair<K, T>(key, value);
-				return;
+				return true;
 			}
 		}
 	}
@@ -165,7 +163,7 @@ public:
 		return false;
 	}
 
-	T* search(const K& key) {
+	T* search(const K& key) { // std::optional<std::reference_wrapper<T>>
 		size_t index = hash(key);
 		auto tmp = _buskets[index];
 		if (tmp == nullptr) {
@@ -179,7 +177,12 @@ public:
 		}
 		return nullptr;
 	}
-	bool erase(const K& key) const {
+
+	const T* search(const K& key) const {
+		return const_cast<Map*>(this)->search(key);
+	}
+
+	bool erase(const K& key) {
 		size_t index = hash(key);
 		auto tmp = _buskets[index];
 		if (tmp == nullptr) {
@@ -203,7 +206,7 @@ public:
 		return false;
 	}
 
-	int count(const K& key) {
+	int count(const K& key) const {
 		size_t index = hash(key);
 		auto tmp = _buskets[index];
 		while (tmp) {
@@ -220,14 +223,15 @@ public:
 		for (size_t i(0); i < _size; ++i) {
 			tmp = _buskets[i];
 			while (tmp) {
-				std::cout << tmp->key << " : " << tmp->value << std::endl;
+				std::cout << tmp->key << " : " << tmp->value << " ";
 				tmp = tmp->next;
 			}
+			std::cout<<endl;
 		}
 	}
 };
 
-char pearson_hash(Map<char, char> map, const std::string& str) {
+char pearson_hash(const Map<char, char>& map, const std::string& str) {
 	char hash = 0;
 	for (char c : str) {
 		hash = *map.search((hash ^ (unsigned)c));
@@ -236,7 +240,7 @@ char pearson_hash(Map<char, char> map, const std::string& str) {
 }
 
 bool is_equal(const std::string& left, const std::string& right) {
-	auto map = Map<char, char>(16, time(NULL));
+	const static auto map = Map<char, char>(16, 1655);
 	if (pearson_hash(map, left) == pearson_hash(map, right)) {
 		return true;
 	}
